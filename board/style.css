@@ -5,6 +5,10 @@
     margin: 0 auto;
     color: #333;
 }
+h1:not(:first-of-type) {
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}
 .nickname {
     font-size: 12px;
     color: #666;
