@@ -6,7 +6,7 @@ require_once 'MyValidator.php';
 // エスケープ処理(e関数の有効化)
 require_once 'Encode.php';
 // XSS対策
-require_once 'HTMLPurifier/HTMLPurifier.auto.php';
+//require_once 'HTMLPurifier/HTMLPurifier.auto.php';
 
 ?>
 
@@ -25,7 +25,7 @@ require_once 'HTMLPurifier/HTMLPurifier.auto.php';
 $nickname = "";
 $comment = "";
 $now = new DateTime();
-$postdate = $now -> format('Y-m-d H:i:s');
+$postDate = $now -> format('Y-m-d H:i:s');
 
 
 if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
@@ -39,14 +39,12 @@ if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
         $v->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
         $v();
 
+        // 変数に代入
+        $nickname = $_POST['nickname'];
+        $comment = nl2br($_POST['comment']);
     } else {
         $_error[] = '入力してください';
     }
-
-    // 変数に代入
-    $nickname = $_POST['nickname'];
-    $pur = new HTMLPurifier(); // 浄化準備
-    $comment = nl2br($_POST['comment']);
 }
 try {
     // データベースへの接続を確立
@@ -55,7 +53,7 @@ try {
     $stt = $db->prepare('INSERT INTO board(nickname, postdate, comment) VALUES(:nickname, :postdate, :comment)');
     // INSERT命令にポストデータの内容セット
     $stt->bindValue(':nickname', $nickname);
-    $stt->bindValue(':postdate', $postdate);
+    $stt->bindValue(':postdate', $postDate);
     $stt->bindValue(':comment', $comment);
     // INSERT命令を実行
     $stt->execute();
@@ -65,7 +63,7 @@ try {
 </div>
 <p class="nickname">投稿者:<?php e($nickname); ?></p>
 <div class="comment"><?php e($comment); ?></div>
-<p class="postdate"><?php e($postdate); ?></p>
+<p class="postdate"><?php e($postDate); ?></p>
 <?php
     $db = NULL;
 } catch(PDOException $e) {
@@ -75,10 +73,10 @@ try {
 // header('Location: http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']).'/index.php');
 
 ?>
-<form method="POST" action="index.php">
+<form method="POST" action="post.php">
     <p class="btn"><button type="submit" name="btn1">投稿画面へ</button></p>
 </form>
-<form method="POST" action="board.php">
+<form method="POST" action="index.php">
     <p class="btn"><button type="submit" name="btn2">一覧画面へ</button></p>
 </form>
 </div>

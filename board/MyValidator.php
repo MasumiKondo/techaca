@@ -107,6 +107,7 @@ class MyValidator {
 				print "<li>{$err}</li>";
 			}
 			print '</ul>';
+			print '<p>ブラウザのバックで戻ってください</p>';
 			die();
 		}
 	}

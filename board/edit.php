@@ -18,4 +18,4 @@ try {
     die("エラーメッセージ：{$e->getMessage()}");
 }
 // 処理後は元のフォームにリダイレクト
- header('Location: http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']).'/board.php');
+ header('Location: http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']).'/index.php');
