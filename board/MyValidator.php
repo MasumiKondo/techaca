@@ -3,9 +3,11 @@ require_once 'DbManager.php';
 
 class MyValidator {
 	private $_errors;
+	public $errormsg;
 
 	public function __construct() {
 		$_errors = array();
+		$errormsg = array();
 		$this->checkEncoding($_GET);
 		$this->checkEncoding($_POST);
 		$this->checkEncoding($_COOKIE);
@@ -100,15 +102,19 @@ class MyValidator {
 		}
 	}
 
-	public function __invoke() {
-		if (count($this->_errors) > 0) {
-			print '<ul class="errormsg">';
-			foreach ($this->_errors as $err) {
-				print "<li>{$err}</li>";
-			}
-			print '</ul>';
-			print '<p>ブラウザのバックで戻ってください</p>';
-			die();
+	public function confirm() {
+		if (count($this->_errors) <= 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function errorMessage() {
+		foreach ((array)$this->_errors as $err) {
+			//$errormsg[] = $err;
+			print $err;
+			print '<br>';
 		}
 	}
 }

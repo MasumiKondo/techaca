@@ -31,14 +31,15 @@ $postdate = $now -> format('Y-m-d H:i:s');
 try {
     // データベースへの接続を確立
     $db = getDb();
-?>
-<?php
+
     //　一覧を作る
     $sttw = $db->prepare('SELECT * FROM board ORDER BY id DESC');
     $sttw ->execute();
     //結果セットの内容を順に出力
+    $count = 0;
     while($row = $sttw->fetch(PDO::FETCH_ASSOC)){
         $id = $row['id'];
+        $count++;
 ?>
 <form action="edit.php" method="post">
 <p class="nickname">投稿者:<?php e($row['nickname']); ?>[<?php e($id); ?>]
@@ -49,13 +50,17 @@ try {
 </form>
 <?php
     }
+    //結果セットが無い場合
+    if($count === 0){
+        print '<p>まだ投稿されていません</p>';
+    }
     $db = NULL;
 } catch(PDOException $e) {
     die("エラーメッセージ：{$e->getMessage()}");
 }
 
 ?>
-<form method="POST" action="post.php">
+<form method="GET" action="post.php">
     <p class="btn"><button type="submit" name="btn1">投稿画面へ</button></p>
 </form>
 </div>

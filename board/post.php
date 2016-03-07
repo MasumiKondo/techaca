@@ -1,8 +1,18 @@
 <?php
+// DBと接続(getDb関数の有効化)
+require_once 'DbManager.php';
 // フォームバリデータ
 require_once 'MyValidator.php';
 // エスケープ処理(e関数の有効化)
 require_once 'Encode.php';
+
+//初期化
+$nickname = "";
+$comment = "";
+$now = new DateTime();
+$postDate = $now -> format('Y-m-d H:i:s');
+$errmsg = array();
+$check = FALSE;
 
 ?>
 <!DOCTYPE HTML>
@@ -14,20 +24,102 @@ require_once 'Encode.php';
 </head>
 <body>
 <div class="main">
-<h1>掲示板</h1>
-<div class="errormsg">
+    <h1>掲示板</h1>
 
-</div>
+<?php
+if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
+// フォームからPOSTによって要求された場合
 
-<form method="POST" action="confirm.php">
+    // フォームに入力されてるか確認
+    if ( isset ( $_POST['nickname'])  &&  isset ( $_POST['comment']) ) {
+        //バリデータ
+        $validate = new MyValidator();
+        $validate->requiredCheck($_POST['nickname'],'投稿者名'); //必須検証
+        $validate->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
+        $check = $validate->confirm();
+
+        // 変数に代入
+        $nickname = $_POST['nickname'];
+        $comment = nl2br($_POST['comment']);
+    } else {
+        $errmsg[] = '入力してください';
+    }
+
+    if(($check == FALSE) || (count($errmsg) > 0)){ //エラーがあったら
+        print '<div class="errormsg">';
+        $errmsg = $validate->errorMessage();
+        // validate以外のエラーはerrormsgに入ってる
+        foreach ((array)$errmsg as $message) {
+            print $message;
+            print '<br>';
+        }
+        print '</div>';
+
+?>
+<form method="POST" action="post.php">
     <dl>
         <dt>投稿者：</dt>
-        <dd><input type="text" name="nickname"></dd>
+        <dd><input type="text" name="nickname" value="<?php e($nickname); ?>"></dd>
+        <dt>内容：</dt>
+        <dd><textarea name="comment" rows="8" cols="40"><?php e($comment); ?></textarea></dd>
+    </dl>
+    <p class="btn"><button type="submit" name="btn1">投稿する</button></p>
+</form>
+
+<?php
+    } else { //エラーがなかったら
+        try {
+            // データベースへの接続を確立
+            $db = getDb();
+            // insert命令準備
+            $stt = $db->prepare('INSERT INTO board(nickname, postdate, comment) VALUES(:nickname, :postdate, :comment)');
+            // INSERT命令にポストデータの内容セット
+            $stt->bindValue(':nickname', $nickname);
+            $stt->bindValue(':postdate', $postDate);
+            $stt->bindValue(':comment', $comment);
+            // INSERT命令を実行
+            $stt->execute();
+
+?>
+    <div class="message">
+        <p>以下内容が投稿されました</p>
+    </div>
+    <p class="nickname">投稿者:<?php e($nickname); ?></p>
+    <div class="comment"><?php e($comment); ?></div>
+    <p class="postdate"><?php e($postDate); ?></p>
+    <form method="GET" action="post.php">
+        <p class="btn"><button type="submit" name="btn1">投稿画面へ</button></p>
+    </form>
+    <form method="GET" action="index.php">
+        <p class="btn"><button type="submit" name="btn2">一覧画面へ</button></p>
+    </form>
+
+<?php
+            $db = NULL;
+        } catch(PDOException $e) {
+            die("エラーメッセージ：{$e->getMessage()}");
+        }
+
+    }//エラー有る無しのif文end
+
+} else { //フォームからGETによって要求された場合(初めてフォームを開いたとき)
+
+?>
+<form method="POST" action="post.php">
+    <dl>
+        <dt>投稿者：</dt>
+        <dd><input type="text" name="nickname" value=""></dd>
         <dt>内容：</dt>
         <dd><textarea name="comment" rows="8" cols="40"></textarea></dd>
     </dl>
     <p class="btn"><button type="submit" name="btn1">投稿する</button></p>
 </form>
+
+<?php
+} //フォームがPOSTかGETかのif文end
+?>
+
+
 </div>
 </body>
 </html>

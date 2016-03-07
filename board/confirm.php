@@ -34,16 +34,20 @@ if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
     // フォームに入力されてるか確認
     if ( isset ( $_POST['nickname'])  &&  isset ( $_POST['comment']) ) {
         //バリデータ
-        $v = new MyValidator();
-        $v->requiredCheck($_POST['nickname'],'投稿者名'); //必須検証
-        $v->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
-        $v();
+        $validate = new MyValidator();
+        $validate->requiredCheck($_POST['nickname'],'投稿者名'); //必須検証
+        $validate->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
+        $check = $validate->confirm();
+
+        if(!$check){
+            $validate->errorMessage();
+        }
 
         // 変数に代入
         $nickname = $_POST['nickname'];
         $comment = nl2br($_POST['comment']);
     } else {
-        $_error[] = '入力してください';
+        $_errors[] = '入力してください';
     }
 }
 try {
@@ -69,8 +73,7 @@ try {
 } catch(PDOException $e) {
     die("エラーメッセージ：{$e->getMessage()}");
 }
-// 処理後は元のフォームにリダイレクト
-// header('Location: http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']).'/index.php');
+
 
 ?>
 <form method="POST" action="post.php">
