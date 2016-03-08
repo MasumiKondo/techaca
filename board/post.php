@@ -11,7 +11,7 @@ $nickname = "";
 $comment = "";
 $now = new DateTime();
 $postDate = $now -> format('Y-m-d H:i:s');
-$errmsg = array();
+$errorMsg = array();
 $check = FALSE;
 
 ?>
@@ -36,25 +36,23 @@ if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
         $validate = new MyValidator();
         $validate->requiredCheck($_POST['nickname'],'投稿者名'); //必須検証
         $validate->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
-        $check = $validate->confirm();
+        $check = $validate->isErrorMsgExist();
 
         // 変数に代入
         $nickname = $_POST['nickname'];
         $comment = nl2br($_POST['comment']);
     } else {
-        $errmsg[] = '入力してください';
+        $errorMsg[] = '入力してください';
     }
 
-    if(($check == FALSE) || (count($errmsg) > 0)){ //エラーがあったら
+    if(($check == FALSE) || (count($errorMsg) > 0)){ //エラーがあったら
+        $errorMsg = $validate->getErrorMsg();
         print '<div class="errormsg">';
-        $errmsg = $validate->errorMessage();
-        // validate以外のエラーはerrormsgに入ってる
-        foreach ((array)$errmsg as $message) {
+        foreach ((array)$errorMsg as $message) {
             print $message;
             print '<br>';
         }
         print '</div>';
-
 ?>
 <form method="POST" action="post.php">
     <dl>
