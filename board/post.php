@@ -11,8 +11,7 @@ $nickname = "";
 $comment = "";
 $now = new DateTime();
 $postDate = $now -> format('Y-m-d H:i:s');
-$errorMsg = array();
-$check = FALSE;
+$errorMessage = array();
 
 ?>
 <!DOCTYPE HTML>
@@ -27,45 +26,44 @@ $check = FALSE;
     <h1>掲示板</h1>
 
 <?php
-if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
-// フォームからPOSTによって要求された場合
+if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {// フォームからPOSTによって要求された場合
 
-    // フォームに入力されてるか確認
-    if ( isset ( $_POST['nickname'])  &&  isset ( $_POST['comment']) ) {
-        //バリデータ
-        $validate = new MyValidator();
-        $validate->requiredCheck($_POST['nickname'],'投稿者名'); //必須検証
-        $validate->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
-        $check = $validate->isErrorMsgExist();
+    //バリデータ
+    $validate = new MyValidator();
+    $validate->requiredCheck($_POST['nickname'],'投稿者名'); //必須検証
+    $validate->requiredCheck($_POST['comment'],'投稿内容'); //必須検証
+    $validate->lengthCheck($_POST['nickname'],'投稿者名',255); //文字列長検証
+    $validate->lengthCheck($_POST['comment'],'投稿内容',255); //文字列長検証
 
-        // 変数に代入
-        $nickname = $_POST['nickname'];
-        $comment = nl2br($_POST['comment']);
-    } else {
-        $errorMsg[] = '入力してください';
-    }
 
-    if(($check == FALSE) || (count($errorMsg) > 0)){ //エラーがあったら
-        $errorMsg = $validate->getErrorMsg();
+    if($validate->isErrorMessageExist()){ //エラーがあったら
+        $errorMessage = $validate->geterrorMessage();
         print '<div class="errormsg">';
-        foreach ((array)$errorMsg as $message) {
+        foreach ((array)$errorMessage as $message) {
             print $message;
             print '<br>';
         }
         print '</div>';
-?>
-<form method="POST" action="post.php">
-    <dl>
-        <dt>投稿者：</dt>
-        <dd><input type="text" name="nickname" value="<?php e($nickname); ?>"></dd>
-        <dt>内容：</dt>
-        <dd><textarea name="comment" rows="8" cols="40"><?php e($comment); ?></textarea></dd>
-    </dl>
-    <p class="btn"><button type="submit" name="btn1">投稿する</button></p>
-</form>
+        ?>
+        <!-- エラーのときに表示する -->
+        <form method="POST" action="post.php">
+            <dl>
+                <dt>投稿者：</dt>
+                <dd><input type="text" name="nickname" value="<?php e($nickname); ?>"></dd>
+                <dt>内容：</dt>
+                <dd><textarea name="comment" rows="8" cols="40"><?php e($comment); ?></textarea></dd>
+            </dl>
+            <p class="btn"><button type="submit" name="btn1">投稿する</button></p>
+        </form>
 
-<?php
+        <?php
+
     } else { //エラーがなかったら
+
+        // 変数に代入
+        $nickname = $_POST['nickname'];
+        $comment = nl2br($_POST['comment']);
+
         try {
             // データベースへの接続を確立
             $db = getDb();
@@ -79,6 +77,7 @@ if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
             $stt->execute();
 
 ?>
+    <!-- 投稿が成功したときに表示 -->
     <div class="message">
         <p>以下内容が投稿されました</p>
     </div>
@@ -103,6 +102,8 @@ if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
 } else { //フォームからGETによって要求された場合(初めてフォームを開いたとき)
 
 ?>
+
+<!-- GETのときに表示　-->
 <form method="POST" action="post.php">
     <dl>
         <dt>投稿者：</dt>
