@@ -1,0 +1,43 @@
+/* style css */
+
+.main {
+    width: 900px;
+    margin: 0 auto;
+    color: #333;
+}
+.nickname {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+    position: relative;
+}
+.comment {
+    background: #f6f6f6;
+    padding: 15px;
+}
+.message {
+    border-bottom: 1px solid #ccc;
+
+}
+.postdate {
+    font-size: 11px;
+    color: #999;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+    text-align: right;
+}
+.edit {
+    position: absolute;
+    right: 0;
+}
+.errormsg {
+    color: #c00;
+    font-weight: bold;
+}
+.btn {
+    text-align: center;
+}
+.date {
+    text-align: right;
+}
