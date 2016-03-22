@@ -1,5 +1,6 @@
 <?php
-define( 'SMARTY_DIR', '/Applications/MAMP/htdocs/techaca/board2/data/Smarty/' );
+define( 'SMARTY_DIR', $_SERVER['DOCUMENT_ROOT'].'/techaca/board2/data/Smarty/' );
+define( 'DATA_DIR', $_SERVER['DOCUMENT_ROOT'].'/techaca/board2/data/' );
 // Smarty.classの呼び出し
 require_once( SMARTY_DIR .'Smarty.class.php' );
 // DBと接続(getDb関数の有効化)
@@ -14,10 +15,10 @@ function & getSmartyObj(){
 
     if( is_null( $smarty ) ){
         $smarty = new Smarty();
-        $smarty->template_dir = '/Applications/MAMP/htdocs/techaca/board2/data/templates/';
-        $smarty->compile_dir  = '/Applications/MAMP/htdocs/techaca/board2/data/templates_c/';
-        $smarty->config_dir   = '/Applications/MAMP/htdocs/techaca/board2/data/configs/';
-        $smarty->cache_dir    = '/Applications/MAMP/htdocs/techaca/board2/data/cache/';
+        $smarty->template_dir = DATA_DIR .'templates/';
+        $smarty->compile_dir  = DATA_DIR .'templates_c/';
+        $smarty->config_dir   = DATA_DIR .'configs/';
+        $smarty->cache_dir    = DATA_DIR .'cache/';
     }
 
     return $smarty;
